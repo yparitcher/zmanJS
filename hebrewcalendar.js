@@ -89,10 +89,12 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 
 	this.setoffset = function (offset) {
 		this.offset = offset
+		return this;
 	}
 
 	this.setEY = function (EY) {
 		this.EY = EY;
+		return this;
 	}
 
 	this.convertDate = function (date){
@@ -167,6 +169,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 		this.dayofyear += this.day;
 		this.wday = (HebrewCalendarElapsedDays(this.year)+this.dayofyear)%7;
 		this.leap = HebrewLeapYear(this.year);
+		return this;
 	}
 
 	this.hdateaddyear = function (years) {
@@ -179,6 +182,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 			if (!leap1 && this.month == 12){this.month = 13;}
 		}
 		this.hdatesetdoy();
+		return this;
 	}
 
 	this.hdateaddmonth = function (months) {
@@ -231,6 +235,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 		}
 		if (last && LastDayOfHebrewMonth(this.month, this.year) == 30){this.day = 30;}
 		this.hdatesetdoy();
+		return this;
 	}
 
 	this.hdateaddday = function (days) {
@@ -281,6 +286,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 			}
 		}
 		this.hdatesetdoy();
+		return this;
 	}
 
 	this.hdateaddhour = function (hours) {
@@ -289,6 +295,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 		this.hour = args.finish;
 		if (args.carry){this.hdateaddday(args.carry);}
 		else {this.hdatesetdoy();}
+		return this;
 	}
 
 	this.hdateaddminute = function (minutes) {
@@ -297,6 +304,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 		this.min = args.finish;
 		if (args.carry){this.hdateaddhour(args.carry);}
 		else {this.hdatesetdoy();}
+		return this;
 	}
 
 	this.hdateaddsecond = function (seconds) {
@@ -305,6 +313,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 		this.sec = args.finish;
 		if (args.carry){this.hdateaddminute(args.carry);}
 		else {this.hdatesetdoy();}
+		return this;
 	}
 
 	this.hdateaddmsecond = function (mseconds) {
@@ -313,6 +322,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 		this.msec = args.finish;
 		if (args.carry){this.hdateaddsecond(args.carry);}
 		else {this.hdatesetdoy();}
+		return this;
 	}
 
 	this.hdateadd = function (years, months, days, hours, minutes, seconds, mseconds) {
@@ -323,6 +333,7 @@ function hdate(year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0, offset=0
 		if (minutes) {this.hdateaddminute(minutes);}
 		if (seconds) {this.hdateaddsecond(seconds);}
 		if (mseconds) {this.hdateaddmsecond(mseconds);}
+		return this;
 	}
 
 	this.getYearType = function () {
