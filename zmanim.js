@@ -1,16 +1,18 @@
-'use strict'
 /*
 Copyright (c) 2018 Y Paritcher
 */
 
-function getLocalMeanTimeOffset(now, here)
+(function () {
+'use strict'
+
+zmanJS.getLocalMeanTimeOffset = function (now, here)
 {
 	return Math.trunc(here.longitude * 4 * 60 - now.offset);
 }
 
-function getAntimeridianAdjustment(now, here)
+zmanJS.getAntimeridianAdjustment = function (now, here)
 {
-	let localHoursOffset = getLocalMeanTimeOffset(now, here) / 3600;
+	let localHoursOffset = zmanJS.getLocalMeanTimeOffset(now, here) / 3600;
 	/*if the offset is 20 hours or more in the future (never expected anywhere other
 	 * than a location using a timezone across the anti meridian to the east such as Samoa) */
 	if (localHoursOffset >= 20)
@@ -29,13 +31,13 @@ function getAntimeridianAdjustment(now, here)
 	return 0;
 }
 
-function getDateFromTime(current, time, here, isSunrise)
+zmanJS.getDateFromTime = function (current, time, here, isSunrise)
 {
-	let result = new hdate();
+	let result = new zmanJS.hdate();
 	if (isNaN(time)) {
 		return result;
 	}
-	let adjustment = getAntimeridianAdjustment(current, here);
+	let adjustment = zmanJS.getAntimeridianAdjustment(current, here);
 	let calculatedTime = time;
 	result.year = current.year;
 	result.EY = current.EY;
@@ -66,22 +68,22 @@ function getDateFromTime(current, time, here, isSunrise)
 	return result;
 }
 
-function calcsunrise(date, here, zenith, adjustForElevation)
+zmanJS.calcsunrise = function (date, here, zenith, adjustForElevation)
 {
-	let sunrise = getUTCSunrise(date.hdatejulian(), here, zenith, adjustForElevation);
-	return getDateFromTime(date, sunrise, here, 1);
+	let sunrise = zmanJS.getUTCSunrise(date.hdatejulian(), here, zenith, adjustForElevation);
+	return zmanJS.getDateFromTime(date, sunrise, here, 1);
 }
 
-function calcsunset(date, here, zenith, adjustForElevation)
+zmanJS.calcsunset = function (date, here, zenith, adjustForElevation)
 {
-	let sunset = getUTCSunset(date.hdatejulian(), here, zenith, adjustForElevation);
-	return getDateFromTime(date, sunset, here, 0);
+	let sunset = zmanJS.getUTCSunset(date.hdatejulian(), here, zenith, adjustForElevation);
+	return zmanJS.getDateFromTime(date, sunset, here, 0);
 }
 
-function calcshaahzmanis(startday, endday)
+zmanJS.calcshaahzmanis = function (startday, endday)
 {
-	let start = HebrewCalendarElapsedDays(startday.year)+(startday.dayofyear-1);
-	let end = HebrewCalendarElapsedDays(endday.year)+(endday.dayofyear-1);
+	let start = zmanJS.HebrewCalendarElapsedDays(startday.year)+(startday.dayofyear-1);
+	let end = zmanJS.HebrewCalendarElapsedDays(endday.year)+(endday.dayofyear-1);
 	let diff = end - start;
 	diff = (diff * 24) + (endday.hour - startday.hour);
 	diff = (diff * 60) + (endday.min - startday.min);
@@ -91,344 +93,344 @@ function calcshaahzmanis(startday, endday)
 	return Math.trunc(diff / 12);
 }
 
-function calctimeoffset(time, offset)
+zmanJS.calctimeoffset = function (time, offset)
 {
-	let result = new hdate();
+	let result = new zmanJS.hdate();
 	if (time.year == 0 || offset == 0) return result;
 	Object.assign(result, time);
 	result.hdateaddmsecond(offset);
 	return result;
 }
 
-function getalos(date, here)
+zmanJS.getalos = function (date, here)
 {
-	return calcsunrise(date, here, 106.1, 0);
+	return zmanJS.calcsunrise(date, here, 106.1, 0);
 }
 
-function getalosbaalhatanya(date, here)
+zmanJS.getalosbaalhatanya = function (date, here)
 {
-	return calcsunrise(date, here, 106.9, 0);
+	return zmanJS.calcsunrise(date, here, 106.9, 0);
 }
 
-function getalos26degrees(date, here)
+zmanJS.getalos26degrees = function (date, here)
 {
-	return calcsunrise(date, here, 116.0, 0);
+	return zmanJS.calcsunrise(date, here, 116.0, 0);
 }
 
-function getalos19p8degrees(date, here)
+zmanJS.getalos19p8degrees = function (date, here)
 {
-	return calcsunrise(date, here, 109.8, 0);
+	return zmanJS.calcsunrise(date, here, 109.8, 0);
 }
 
-function getalos18degrees(date, here)
+zmanJS.getalos18degrees = function (date, here)
 {
-	return calcsunrise(date, here, 108, 0);
+	return zmanJS.calcsunrise(date, here, 108, 0);
 }
 
-function getalos120(date, here)
+zmanJS.getalos120 = function (date, here)
 {
-	return calctimeoffset(getsunrise(date, here), -7200000);
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), -7200000);
 }
 
-function getalos120zmanis(date, here)
+zmanJS.getalos120zmanis = function (date, here)
 {
-	let shaahzmanis = getshaahzmanisgra(date, here);
-	if (shaahzmanis == 0) return new hdate();
-	return calctimeoffset(getsunrise(date, here), Math.trunc(shaahzmanis * -2));
+	let shaahzmanis = zmanJS.getshaahzmanisgra(date, here);
+	if (shaahzmanis == 0) return new zmanJS.hdate();
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), Math.trunc(shaahzmanis * -2));
 }
 
-function getalos96(date, here)
+zmanJS.getalos96 = function (date, here)
 {
-	return calctimeoffset(getsunrise(date, here), -5760000);
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), -5760000);
 }
 
-function getalos96zmanis(date, here)
+zmanJS.getalos96zmanis = function (date, here)
 {
-	let shaahzmanis = getshaahzmanisgra(date, here);
-	if (shaahzmanis == 0) return new hdate();
-	return calctimeoffset(getsunrise(date, here), Math.trunc(shaahzmanis * -1.6));
+	let shaahzmanis = zmanJS.getshaahzmanisgra(date, here);
+	if (shaahzmanis == 0) return new zmanJS.hdate();
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), Math.trunc(shaahzmanis * -1.6));
 }
 
-function getalos90(date, here)
+zmanJS.getalos90 = function (date, here)
 {
-	return calctimeoffset(getsunrise(date, here), -5400000);
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), -5400000);
 }
 
-function getalos90zmanis(date, here)
+zmanJS.getalos90zmanis = function (date, here)
 {
-	let shaahzmanis = getshaahzmanisgra(date, here);
-	if (shaahzmanis == 0) return new hdate();
-	return calctimeoffset(getsunrise(date, here), Math.trunc(shaahzmanis * -1.5));
+	let shaahzmanis = zmanJS.getshaahzmanisgra(date, here);
+	if (shaahzmanis == 0) return new zmanJS.hdate();
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), Math.trunc(shaahzmanis * -1.5));
 }
 
-function getalos72(date, here)
+zmanJS.getalos72 = function (date, here)
 {
-	return calctimeoffset(getsunrise(date, here), -4320000);
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), -4320000);
 }
 
-function getalos72zmanis(date, here)
+zmanJS.getalos72zmanis = function (date, here)
 {
-	let shaahzmanis = getshaahzmanisgra(date, here);
-	if (shaahzmanis == 0) return new hdate();
-	return calctimeoffset(getsunrise(date, here), Math.trunc(shaahzmanis * -1.2));
+	let shaahzmanis = zmanJS.getshaahzmanisgra(date, here);
+	if (shaahzmanis == 0) return new zmanJS.hdate();
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), Math.trunc(shaahzmanis * -1.2));
 }
 
-function getalos60(date, here)
+zmanJS.getalos60 = function (date, here)
 {
-	return calctimeoffset(getsunrise(date, here), -3600000);
+	return zmanJS.calctimeoffset(zmanJS.getsunrise(date, here), -3600000);
 }
 
-function getmisheyakir11p5degrees(date, here)
+zmanJS.getmisheyakir11p5degrees = function (date, here)
 {
-	return calcsunrise(date, here, 101.5, 0);
+	return zmanJS.calcsunrise(date, here, 101.5, 0);
 }
 
-function getmisheyakir11degrees(date, here)
+zmanJS.getmisheyakir11degrees = function (date, here)
 {
-	return calcsunrise(date, here, 101.0, 0);
+	return zmanJS.calcsunrise(date, here, 101.0, 0);
 }
 
-function getmisheyakir10p2degrees(date, here)
+zmanJS.getmisheyakir10p2degrees = function (date, here)
 {
-	return calcsunrise(date, here, 100.2, 0);
+	return zmanJS.calcsunrise(date, here, 100.2, 0);
 }
 
-function getsunrise(date, here)
+zmanJS.getsunrise = function (date, here)
 {
-	return calcsunrise(date, here, 90.0, 0);
+	return zmanJS.calcsunrise(date, here, 90.0, 0);
 }
 
-function getsunrisebaalhatanya(date, here)
+zmanJS.getsunrisebaalhatanya = function (date, here)
 {
-	return calcsunrise(date, here, 91.583, 0);
+	return zmanJS.calcsunrise(date, here, 91.583, 0);
 }
 
-function getelevationsunrise(date, here)
+zmanJS.getelevationsunrise = function (date, here)
 {
-	return calcsunrise(date, here, 90.0, 1);
+	return zmanJS.calcsunrise(date, here, 90.0, 1);
 }
 
-function calcshma(startday, endday)
+zmanJS.calcshma = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, shaahzmanis * 3);
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, shaahzmanis * 3);
 }
 
-function getshmabaalhatanya(date, here)
+zmanJS.getshmabaalhatanya = function (date, here)
 {
-	return calcshma(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcshma(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getshmagra(date, here)
+zmanJS.getshmagra = function (date, here)
 {
-	return calcshma(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcshma(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getshmamga(date, here)
+zmanJS.getshmamga = function (date, here)
 {
-	return calcshma(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calcshma(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function calctefila(startday, endday)
+zmanJS.calctefila = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, shaahzmanis * 4);
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, shaahzmanis * 4);
 }
 
-function gettefilabaalhatanya(date, here)
+zmanJS.gettefilabaalhatanya = function (date, here)
 {
-	return calctefila(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calctefila(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function gettefilagra(date, here)
+zmanJS.gettefilagra = function (date, here)
 {
-	return calctefila(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calctefila(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function gettefilamga(date, here)
+zmanJS.gettefilamga = function (date, here)
 {
-	return calctefila(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calctefila(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function getachilaschometzbaalhatanya(date, here)
+zmanJS.getachilaschometzbaalhatanya = function (date, here)
 {
-	return calctefila(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calctefila(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getachilaschometzgra(date, here)
+zmanJS.getachilaschometzgra = function (date, here)
 {
-	return calctefila(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calctefila(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getachilaschometzmga(date, here)
+zmanJS.getachilaschometzmga = function (date, here)
 {
-	return calctefila(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calctefila(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function calcbiurchometz(startday, endday)
+zmanJS.calcbiurchometz = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, shaahzmanis * 5);
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, shaahzmanis * 5);
 }
 
-function getbiurchometzbaalhatanya(date, here)
+zmanJS.getbiurchometzbaalhatanya = function (date, here)
 {
-	return calcbiurchometz(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcbiurchometz(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getbiurchometzgra(date, here)
+zmanJS.getbiurchometzgra = function (date, here)
 {
-	return calcbiurchometz(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcbiurchometz(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getbiurchometzmga(date, here)
+zmanJS.getbiurchometzmga = function (date, here)
 {
-	return calcbiurchometz(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calcbiurchometz(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function calcchatzos(startday, endday)
+zmanJS.calcchatzos = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, shaahzmanis * 6);
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, shaahzmanis * 6);
 }
 
-function getchatzosbaalhatanya(date, here)
+zmanJS.getchatzosbaalhatanya = function (date, here)
 {
-	return calcchatzos(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcchatzos(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getchatzosgra(date, here)
+zmanJS.getchatzosgra = function (date, here)
 {
-	return calcchatzos(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcchatzos(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function calcminchagedola(startday, endday)
+zmanJS.calcminchagedola = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, Math.trunc(shaahzmanis * 6.5));
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, Math.trunc(shaahzmanis * 6.5));
 }
 
-function getminchagedolabaalhatanya(date, here)
+zmanJS.getminchagedolabaalhatanya = function (date, here)
 {
-	return calcminchagedola(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcminchagedola(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getminchagedolagra(date, here)
+zmanJS.getminchagedolagra = function (date, here)
 {
-	return calcminchagedola(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcminchagedola(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getminchagedolamga(date, here)
+zmanJS.getminchagedolamga = function (date, here)
 {
-	return calcminchagedola(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calcminchagedola(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function calcminchagedola30min(startday, endday)
+zmanJS.calcminchagedola30min = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, (shaahzmanis * 6) + 1800000);
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, (shaahzmanis * 6) + 1800000);
 }
 
-function calcminchagedolagreater30min(startday, endday)
+zmanJS.calcminchagedolagreater30min = function (startday, endday)
 {
-	return ((calcshaahzmanis(startday, endday)*0.5) >= 1800000) ? calcminchagedola(startday, endday) : calcminchagedola30min(startday, endday);
+	return ((zmanJS.calcshaahzmanis(startday, endday)*0.5) >= 1800000) ? zmanJS.calcminchagedola(startday, endday) : zmanJS.calcminchagedola30min(startday, endday);
 }
 
-function getminchagedolabaalhatanyag30m(date, here)
+zmanJS.getminchagedolabaalhatanyag30m = function (date, here)
 {
-	return calcminchagedolagreater30min(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcminchagedolagreater30min(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getminchagedolagrag30m(date, here)
+zmanJS.getminchagedolagrag30m = function (date, here)
 {
-	return calcminchagedolagreater30min(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcminchagedolagreater30min(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getminchagedolamgag30m(date, here)
+zmanJS.getminchagedolamgag30m = function (date, here)
 {
-	return calcminchagedolagreater30min(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calcminchagedolagreater30min(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function calcminchaketana(startday, endday)
+zmanJS.calcminchaketana = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, Math.trunc(shaahzmanis * 9.5));
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, Math.trunc(shaahzmanis * 9.5));
 }
 
-function getminchaketanabaalhatanya(date, here)
+zmanJS.getminchaketanabaalhatanya = function (date, here)
 {
-	return calcminchaketana(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcminchaketana(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getminchaketanagra(date, here)
+zmanJS.getminchaketanagra = function (date, here)
 {
-	return calcminchaketana(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcminchaketana(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getminchaketanamga(date, here)
+zmanJS.getminchaketanamga = function (date, here)
 {
-	return calcminchaketana(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calcminchaketana(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function calcplag(startday, endday)
+zmanJS.calcplag = function (startday, endday)
 {
-	let shaahzmanis = calcshaahzmanis(startday, endday);
-	return calctimeoffset(startday, Math.trunc(shaahzmanis * 10.75));
+	let shaahzmanis = zmanJS.calcshaahzmanis(startday, endday);
+	return zmanJS.calctimeoffset(startday, Math.trunc(shaahzmanis * 10.75));
 }
 
-function getplagbaalhatanya(date, here)
+zmanJS.getplagbaalhatanya = function (date, here)
 {
-	return calcplag(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcplag(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getplaggra(date, here)
+zmanJS.getplaggra = function (date, here)
 {
-	return calcplag(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcplag(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getplagmga(date, here)
+zmanJS.getplagmga = function (date, here)
 {
-	return calcplag(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calcplag(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
 
-function getcandlelighting(date, here)
+zmanJS.getcandlelighting = function (date, here)
 {
-	return calctimeoffset(calcsunset(date, here, 90.0, 0), -1080000);
+	return zmanJS.calctimeoffset(zmanJS.calcsunset(date, here, 90.0, 0), -1080000);
 }
 
-function getsunset(date, here)
+zmanJS.getsunset = function (date, here)
 {
-	return calcsunset(date, here, 90.0, 0);
+	return zmanJS.calcsunset(date, here, 90.0, 0);
 }
 
-function getsunsetbaalhatanya(date, here)
+zmanJS.getsunsetbaalhatanya = function (date, here)
 {
-	return calcsunset(date, here, 91.583, 0);
+	return zmanJS.calcsunset(date, here, 91.583, 0);
 }
 
-function getelevationsunset(date, here)
+zmanJS.getelevationsunset = function (date, here)
 {
-	return calcsunset(date, here, 90.0, 1);
+	return zmanJS.calcsunset(date, here, 90.0, 1);
 }
 
-function gettzaisbaalhatanya(date, here)
+zmanJS.gettzaisbaalhatanya = function (date, here)
 {
-	return calcsunset(date, here, 96, 1);
+	return zmanJS.calcsunset(date, here, 96, 1);
 }
 
-function gettzais8p5(date, here)
+zmanJS.gettzais8p5 = function (date, here)
 {
-	return calcsunset(date, here, 98.5, 1);
+	return zmanJS.calcsunset(date, here, 98.5, 1);
 }
 
-function gettzais72(date, here)
+zmanJS.gettzais72 = function (date, here)
 {
-	return calctimeoffset(getsunset(date, here), 4320000);
+	return zmanJS.calctimeoffset(zmanJS.getsunset(date, here), 4320000);
 }
 
-function calcmoladoffset(date, offsetsec)
+zmanJS.calcmoladoffset = function (date, offsetsec)
 {
-	let result = getmolad(date.year, date.month);
+	let result = zmanJS.getmolad(date.year, date.month);
 	let tz = (-result.offset) + date.offset;
 	let adjustment = Math.trunc((result.sec * 10)/3) + tz + offsetsec;
 	result.sec = 0;
@@ -438,32 +440,34 @@ function calcmoladoffset(date, offsetsec)
 	return result;
 }
 
-function getmolad7days(date)
+zmanJS.getmolad7days = function (date)
 {
-	return calcmoladoffset(date, 604800);
+	return zmanJS.calcmoladoffset(date, 604800);
 }
 
-function getmoladhalfmonth(date)
+zmanJS.getmoladhalfmonth = function (date)
 {
-	return calcmoladoffset(date, 1275722);
+	return zmanJS.calcmoladoffset(date, 1275722);
 }
 
-function getmolad15days(date)
+zmanJS.getmolad15days = function (date)
 {
-	return calcmoladoffset(date, 1296000);
+	return zmanJS.calcmoladoffset(date, 1296000);
 }
 
-function getshaahzmanisbaalhatanya(date, here)
+zmanJS.getshaahzmanisbaalhatanya = function (date, here)
 {
-	return calcshaahzmanis(getsunrisebaalhatanya(date, here), getsunsetbaalhatanya(date, here));
+	return zmanJS.calcshaahzmanis(zmanJS.getsunrisebaalhatanya(date, here), zmanJS.getsunsetbaalhatanya(date, here));
 }
 
-function getshaahzmanisgra(date, here)
+zmanJS.getshaahzmanisgra = function (date, here)
 {
-	return calcshaahzmanis(getsunrise(date, here), getsunset(date, here));
+	return zmanJS.calcshaahzmanis(zmanJS.getsunrise(date, here), zmanJS.getsunset(date, here));
 }
 
-function getshaahzmanismga(date, here)
+zmanJS.getshaahzmanismga = function (date, here)
 {
-	return calcshaahzmanis(getalos72(date, here), gettzais72(date, here));
+	return zmanJS.calcshaahzmanis(zmanJS.getalos72(date, here), zmanJS.gettzais72(date, here));
 }
+
+}());

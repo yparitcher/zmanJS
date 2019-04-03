@@ -1,9 +1,11 @@
-'use strict'
 /*
 Copyright (c) 2018 Y Paritcher
 */
 
-function formatnum(num) {
+(function () {
+'use strict'
+
+zmanJS.formatnum = function (num) {
 /*
  * Based on https://github.com/Scimonster/js-gematriya
  * Copyright (c) 2014 Eyal Schachter
@@ -62,7 +64,7 @@ function formatnum(num) {
 	return num.join('');
 }
 
-function formattime(date)
+zmanJS.formattime = function (date)
 {
 	let str= "";
 	let hour = date.hour%12;
@@ -72,14 +74,14 @@ function formattime(date)
 	return str;
 }
 
-function formatwday(date, shabbos)
+zmanJS.formatwday = function (date, shabbos)
 {
 	const hwday =[ "שבת", "ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שביעי"];
 	if (shabbos && (date.wday == 7)) {return hwday[0];}
 	return hwday[date.wday];
 }
 
-function formatmonth(date)
+zmanJS.formatmonth = function (date)
 {
 	const hmonth = [ "אדר א׳", "ניסן", "אייר", "סיון", "תמוז", "אב", "אלול", "תשרי", "חשון", "כסלו", "טבת", "שבט", "אדר", "אדר ב׳"];
 	if (date.leap)
@@ -91,117 +93,120 @@ function formatmonth(date)
 	return "";
 }
 
-function meridian(date)
+zmanJS.meridian = function (date)
 {
 	return (date.hour < 11) ? "AM" : "PM";
 }
-function parshahformat(current)
+
+zmanJS.parshahformat = function (current)
 {
 	const parshahchar = ["", "בראשית", "נח", "לך לך", "וירא", "חיי שרה", "תולדות", "ויצא", "וישלח", "וישב", "מקץ", "ויגש", "ויחי", "שמות", "וארא", "בא", "בשלח", "יתרו", "משפטים", "תרומה", "תצוה", "כי תשא", "ויקהל", "פקודי", "ויקרא", "צו", "שמיני", "תזריע", "מצורע", "אחרי מות", "קדושים", "אמור", "בהר", "בחוקותי", "במדבר", "נשא", "בהעלותך", "שלח", "קרח", "חקת", "בלק", "פנחס", "מטות", "מסעי", "דברים", "ואתחנן", "עקב", "ראה", "שופטים", "כי תצא", "כי תבוא", "נצבים", "וילך", "האזינו", "וזאת הברכה", "ויקהל - פקודי", "תזריע - מצורע", "אחרי מות - קדושים", "בהר - בחוקותי", "חקת - בלק", "מטות - מסעי", "נצבים - וילך"];
 	return parshahchar[current];
 }
 
-function yomtovformat(current)
+zmanJS.yomtovformat = function (current)
 {
 	switch(current)
 	{
-		case yomtov.CHOL:
+		case zmanJS.yomtov.CHOL:
 			break;
-		case yomtov.PESACH_DAY1:
-		case yomtov.PESACH_DAY2:
+		case zmanJS.yomtov.PESACH_DAY1:
+		case zmanJS.yomtov.PESACH_DAY2:
 			return "פסח";
-		case yomtov.SHVEI_SHEL_PESACH:
+		case zmanJS.yomtov.SHVEI_SHEL_PESACH:
 			return "שביעי של פסח";
-		case yomtov.ACHRON_SHEL_PESACH:
+		case zmanJS.yomtov.ACHRON_SHEL_PESACH:
 			return "אחרון של פסח";
-		case yomtov.SHAVOUS_DAY1:
-		case yomtov.SHAVOUS_DAY2:
+		case zmanJS.yomtov.SHAVOUS_DAY1:
+		case zmanJS.yomtov.SHAVOUS_DAY2:
 			return "שבועות";
-		case yomtov.ROSH_HASHANAH_DAY1:
-		case yomtov.ROSH_HASHANAH_DAY2:
+		case zmanJS.yomtov.ROSH_HASHANAH_DAY1:
+		case zmanJS.yomtov.ROSH_HASHANAH_DAY2:
 			return "ראש השנה";
-		case yomtov.YOM_KIPPUR:
+		case zmanJS.yomtov.YOM_KIPPUR:
 			return "יום כיפור";
-		case yomtov.SUKKOS_DAY1:
-		case yomtov.SUKKOS_DAY2:
+		case zmanJS.yomtov.SUKKOS_DAY1:
+		case zmanJS.yomtov.SUKKOS_DAY2:
 			return "סוכות";
-		case yomtov.SHMEINI_ATZERES:
+		case zmanJS.yomtov.SHMEINI_ATZERES:
 			return "שמיני עצרת";
-		case yomtov.SIMCHAS_TORAH:
+		case zmanJS.yomtov.SIMCHAS_TORAH:
 			return "שמחת תורה";
-		case yomtov.CHOL_HAMOED_PESACH_DAY1:
-		case yomtov.CHOL_HAMOED_PESACH_DAY2:
-		case yomtov.CHOL_HAMOED_PESACH_DAY3:
-		case yomtov.CHOL_HAMOED_PESACH_DAY4:
-		case yomtov.CHOL_HAMOED_PESACH_DAY5:
+		case zmanJS.yomtov.CHOL_HAMOED_PESACH_DAY1:
+		case zmanJS.yomtov.CHOL_HAMOED_PESACH_DAY2:
+		case zmanJS.yomtov.CHOL_HAMOED_PESACH_DAY3:
+		case zmanJS.yomtov.CHOL_HAMOED_PESACH_DAY4:
+		case zmanJS.yomtov.CHOL_HAMOED_PESACH_DAY5:
 			return "חול המועד פסח";
-		case yomtov.CHOL_HAMOED_SUKKOS_DAY1:
-		case yomtov.CHOL_HAMOED_SUKKOS_DAY2:
-		case yomtov.CHOL_HAMOED_SUKKOS_DAY3:
-		case yomtov.CHOL_HAMOED_SUKKOS_DAY4:
-		case yomtov.CHOL_HAMOED_SUKKOS_DAY5:
+		case zmanJS.yomtov.CHOL_HAMOED_SUKKOS_DAY1:
+		case zmanJS.yomtov.CHOL_HAMOED_SUKKOS_DAY2:
+		case zmanJS.yomtov.CHOL_HAMOED_SUKKOS_DAY3:
+		case zmanJS.yomtov.CHOL_HAMOED_SUKKOS_DAY4:
+		case zmanJS.yomtov.CHOL_HAMOED_SUKKOS_DAY5:
 			return "חול המועד סוכות";
-		case yomtov.HOSHANA_RABBAH:
+		case zmanJS.yomtov.HOSHANA_RABBAH:
 			return "הושענא רבה";
-		case yomtov.PESACH_SHEINI:
+		case zmanJS.yomtov.PESACH_SHEINI:
 			return "פסח שני";
-		case yomtov.LAG_BAOMER:
+		case zmanJS.yomtov.LAG_BAOMER:
 			return "ל״ג בעומר";
-		case yomtov.TU_BAV:
+		case zmanJS.yomtov.TU_BAV:
 			return "ט״ו באב";
-		case yomtov.CHANUKAH_DAY1:
-		case yomtov.CHANUKAH_DAY2:
-		case yomtov.CHANUKAH_DAY3:
-		case yomtov.CHANUKAH_DAY4:
-		case yomtov.CHANUKAH_DAY5:
-		case yomtov.CHANUKAH_DAY6:
-		case yomtov.CHANUKAH_DAY7:
-		case yomtov.CHANUKAH_DAY8:
+		case zmanJS.yomtov.CHANUKAH_DAY1:
+		case zmanJS.yomtov.CHANUKAH_DAY2:
+		case zmanJS.yomtov.CHANUKAH_DAY3:
+		case zmanJS.yomtov.CHANUKAH_DAY4:
+		case zmanJS.yomtov.CHANUKAH_DAY5:
+		case zmanJS.yomtov.CHANUKAH_DAY6:
+		case zmanJS.yomtov.CHANUKAH_DAY7:
+		case zmanJS.yomtov.CHANUKAH_DAY8:
 			return "חנוכה";
-		case yomtov.TU_BISHVAT:
+		case zmanJS.yomtov.TU_BISHVAT:
 			return "ט״ו בשבט";
-		case yomtov.PURIM_KATAN:
+		case zmanJS.yomtov.PURIM_KATAN:
 			return "פורים קטן";
-		case yomtov.SHUSHAN_PURIM_KATAN:
+		case zmanJS.yomtov.SHUSHAN_PURIM_KATAN:
 			return "שושן פורים קטן";
-		case yomtov.PURIM:
+		case zmanJS.yomtov.PURIM:
 			return "פורים";
-		case yomtov.SHUSHAN_PURIM:
+		case zmanJS.yomtov.SHUSHAN_PURIM:
 			return "שושן פורים";
-		case yomtov.SHIVA_ASAR_BTAAMUZ:
+		case zmanJS.yomtov.SHIVA_ASAR_BTAAMUZ:
 			return "שבעה עשר בתמוז";
-		case yomtov.TISHA_BAV:
+		case zmanJS.yomtov.TISHA_BAV:
 			return "ט׳ באב";
-		case yomtov.TZOM_GEDALIA:
+		case zmanJS.yomtov.TZOM_GEDALIA:
 			return "צום גדליה";
-		case yomtov.ASARAH_BTEVES:
+		case zmanJS.yomtov.ASARAH_BTEVES:
 			return "עשרה בטבת";
-		case yomtov.TAANIS_ESTER:
+		case zmanJS.yomtov.TAANIS_ESTER:
 			return "תענית אסתר";
-		case yomtov.EREV_PESACH:
+		case zmanJS.yomtov.EREV_PESACH:
 			return "ערב פסח";
-		case yomtov.EREV_SHAVOUS:
+		case zmanJS.yomtov.EREV_SHAVOUS:
 			return "ערב שבועות";
-		case yomtov.EREV_ROSH_HASHANAH:
+		case zmanJS.yomtov.EREV_ROSH_HASHANAH:
 			return "ערב ראש השנה";
-		case yomtov.EREV_YOM_KIPPUR:
+		case zmanJS.yomtov.EREV_YOM_KIPPUR:
 			return "ערב יום כיפור";
-		case yomtov.EREV_SUKKOS:
+		case zmanJS.yomtov.EREV_SUKKOS:
 			return "ערב סוכות";
-		case yomtov.SHKALIM:
+		case zmanJS.yomtov.SHKALIM:
 			return "שקלים";
-		case yomtov.ZACHOR:
+		case zmanJS.yomtov.ZACHOR:
 			return "זכור";
-		case yomtov.PARAH:
+		case zmanJS.yomtov.PARAH:
 			return "פרה";
-		case yomtov.HACHODESH:
+		case zmanJS.yomtov.HACHODESH:
 			return "החודש";
-		case yomtov.ROSH_CHODESH:
+		case zmanJS.yomtov.ROSH_CHODESH:
 			return "ראש חודש";
-		case yomtov.MACHAR_CHODESH:
+		case zmanJS.yomtov.MACHAR_CHODESH:
 			return "מחר חודש";
-		case yomtov.SHABBOS_MEVORCHIM:
+		case zmanJS.yomtov.SHABBOS_MEVORCHIM:
 			return "שבת מברכים";
 	}
 	return "";
 }
+
+}());

@@ -1,5 +1,3 @@
-'use strict'
-
 /*
 Copyright (c) 2018 Y Paritcher
 */
@@ -8,33 +6,37 @@ Implementation of sunrise and sunset methods to calculate astronomical times bas
 This calculator is based on equations from http://www.srrb.noaa.gov/highlights/sunrise/sunrise.html and
 https://github.com/KosherJava/zmanim/blob/master/src/net/sourceforge/zmanim/util/NOAACalculator.java
 ************/
-const refraction = 34 / 60.0;
-const solarradius = 16 / 60.0;
-const earthradius = 6356.9;
 
-function radToDeg(angleRad)
+(function () {
+'use strict'
+
+zmanJS.refraction = 34 / 60.0;
+zmanJS.solarradius = 16 / 60.0;
+zmanJS.earthradius = 6356.9;
+
+zmanJS.radToDeg = function (angleRad)
 {
 	return (180.0 * angleRad / Math.PI);
 }
 
-function degToRad(angleDeg)
+zmanJS.degToRad = function (angleDeg)
 {
 	return (Math.PI * angleDeg / 180.0);
 }
 
-function calcTimeJulianCent(jd)
+zmanJS.calcTimeJulianCent = function (jd)
 {
 	let jcent = (jd - 2451545.0)/36525.0;
 	return jcent;
 }
 
-function calcJDFromJulianCent(jcent)
+zmanJS.calcJDFromJulianCent = function (jcent)
 {
 	let JD = jcent * 36525.0 + 2451545.0;
 	return JD;
 }
 
-function calcGeomMeanLongSun(jcent)
+zmanJS.calcGeomMeanLongSun = function (jcent)
 {
 	let gmls = 280.46646 + jcent * (36000.76983 + 0.0003032 * jcent);
 	while(gmls > 360.0)
@@ -48,23 +50,23 @@ function calcGeomMeanLongSun(jcent)
 	return gmls;
 }
 
-function calcGeomMeanAnomalySun(jcent)
+zmanJS.calcGeomMeanAnomalySun = function (jcent)
 {
 	let gmas = 357.52911 + jcent * (35999.05029 - 0.0001537 * jcent);
 	return gmas;
 }
 
-function calcEccentricityEarthOrbit(jcent)
+zmanJS.calcEccentricityEarthOrbit = function (jcent)
 {
 	let eeo = 0.016708634 - jcent * (0.000042037 + 0.0000001267 * jcent);
 	return eeo;
 }
 
-function calcSunEqOfCenter(jcent)
+zmanJS.calcSunEqOfCenter = function (jcent)
 {
-	let m = calcGeomMeanAnomalySun(jcent);
+	let m = zmanJS.calcGeomMeanAnomalySun(jcent);
 
-	let mrad = degToRad(m);
+	let mrad = zmanJS.degToRad(m);
 	let sinm = Math.sin(mrad);
 	let sin2m = Math.sin(mrad+mrad);
 	let sin3m = Math.sin(mrad+mrad+mrad);
@@ -73,181 +75,181 @@ function calcSunEqOfCenter(jcent)
 	return seoc;
 }
 
-function calcSunTrueLong(jcent)
+zmanJS.calcSunTrueLong = function (jcent)
 {
-	let gmls = calcGeomMeanLongSun(jcent);
-	let seoc = calcSunEqOfCenter(jcent);
+	let gmls = zmanJS.calcGeomMeanLongSun(jcent);
+	let seoc = zmanJS.calcSunEqOfCenter(jcent);
 
 	let stl = gmls + seoc;
 	return stl;
 }
 
-function calcSunApparentLong(jcent)
+zmanJS.calcSunApparentLong = function (jcent)
 {
-	let stl = calcSunTrueLong(jcent);
+	let stl = zmanJS.calcSunTrueLong(jcent);
 
 	let omega = 125.04 - 1934.136 * jcent;
-	let sal = stl - 0.00569 - 0.00478 * Math.sin(degToRad(omega));
+	let sal = stl - 0.00569 - 0.00478 * Math.sin(zmanJS.degToRad(omega));
 	return sal;
 }
 
-function calcMeanObliquityOfEcliptic(jcent)
+zmanJS.calcMeanObliquityOfEcliptic = function (jcent)
 {
 	let seconds = 21.448 - jcent*(46.8150 + jcent*(0.00059 - jcent*(0.001813)));
 	let mooe = 23.0 + (26.0 + (seconds/60.0))/60.0;
 	return mooe;
 }
 
-function calcObliquityCorrection(jcent)
+zmanJS.calcObliquityCorrection = function (jcent)
 {
-	let mooe = calcMeanObliquityOfEcliptic(jcent);
+	let mooe = zmanJS.calcMeanObliquityOfEcliptic(jcent);
 
 	let omega = 125.04 - 1934.136 * jcent;
-	let oc = mooe + 0.00256 * Math.cos(degToRad(omega));
+	let oc = mooe + 0.00256 * Math.cos(zmanJS.degToRad(omega));
 	return oc;
 }
 
-function calcSunDeclination(jcent)
+zmanJS.calcSunDeclination = function (jcent)
 {
-	let oc = calcObliquityCorrection(jcent);
-	let sal = calcSunApparentLong(jcent);
+	let oc = zmanJS.calcObliquityCorrection(jcent);
+	let sal = zmanJS.calcSunApparentLong(jcent);
 
-	let sint = Math.sin(degToRad(oc)) * Math.sin(degToRad(sal));
-	let sd = radToDeg(Math.asin(sint));
+	let sint = Math.sin(zmanJS.degToRad(oc)) * Math.sin(zmanJS.degToRad(sal));
+	let sd = zmanJS.radToDeg(Math.asin(sint));
 	return sd;
 }
 
-function calcEquationOfTime(jcent)
+zmanJS.calcEquationOfTime = function (jcent)
 {
-	let oc = calcObliquityCorrection(jcent);
-	let gmls = calcGeomMeanLongSun(jcent);
-	let eeo = calcEccentricityEarthOrbit(jcent);
-	let gmas = calcGeomMeanAnomalySun(jcent);
+	let oc = zmanJS.calcObliquityCorrection(jcent);
+	let gmls = zmanJS.calcGeomMeanLongSun(jcent);
+	let eeo = zmanJS.calcEccentricityEarthOrbit(jcent);
+	let gmas = zmanJS.calcGeomMeanAnomalySun(jcent);
 
-	let y = Math.tan(degToRad(oc)/2.0);
+	let y = Math.tan(zmanJS.degToRad(oc)/2.0);
 	y *= y;
 
-	let sin2gmls = Math.sin(2.0 * degToRad(gmls));
-	let singmas   = Math.sin(degToRad(gmas));
-	let cos2gmls = Math.cos(2.0 * degToRad(gmls));
-	let sin4gmls = Math.sin(4.0 * degToRad(gmls));
-	let sin2gmas  = Math.sin(2.0 * degToRad(gmas));
+	let sin2gmls = Math.sin(2.0 * zmanJS.degToRad(gmls));
+	let singmas   = Math.sin(zmanJS.degToRad(gmas));
+	let cos2gmls = Math.cos(2.0 * zmanJS.degToRad(gmls));
+	let sin4gmls = Math.sin(4.0 * zmanJS.degToRad(gmls));
+	let sin2gmas  = Math.sin(2.0 * zmanJS.degToRad(gmas));
 
 	let Etime = y * sin2gmls - 2.0 * eeo * singmas + 4.0 * eeo * y * singmas * cos2gmls
 			- 0.5 * y * y * sin4gmls - 1.25 * eeo * eeo * sin2gmas;
 
-	return radToDeg(Etime)*4.0;
+	return zmanJS.radToDeg(Etime)*4.0;
 }
 
-function calcHourAngleSunrise(lat, solarDec, zenith)
+zmanJS.calcHourAngleSunrise = function (lat, solarDec, zenith)
 {
-	let latRad = degToRad(lat);
-	let sdRad  = degToRad(solarDec);
+	let latRad = zmanJS.degToRad(lat);
+	let sdRad  = zmanJS.degToRad(solarDec);
 
-	let HA = (Math.acos(Math.cos(degToRad(zenith))/(Math.cos(latRad)*Math.cos(sdRad))-Math.tan(latRad) * Math.tan(sdRad)));
+	let HA = (Math.acos(Math.cos(zmanJS.degToRad(zenith))/(Math.cos(latRad)*Math.cos(sdRad))-Math.tan(latRad) * Math.tan(sdRad)));
 
 	return HA;
 }
 
-function calcHourAngleSunset(lat, solarDec, zenith)
+zmanJS.calcHourAngleSunset = function (lat, solarDec, zenith)
 {
-	let latRad = degToRad(lat);
-	let sdRad  = degToRad(solarDec);
+	let latRad = zmanJS.degToRad(lat);
+	let sdRad  = zmanJS.degToRad(solarDec);
 
-	let HA = (Math.acos(Math.cos(degToRad(zenith))/(Math.cos(latRad)*Math.cos(sdRad))-Math.tan(latRad) * Math.tan(sdRad)));
+	let HA = (Math.acos(Math.cos(zmanJS.degToRad(zenith))/(Math.cos(latRad)*Math.cos(sdRad))-Math.tan(latRad) * Math.tan(sdRad)));
 
 	return -HA;
 }
 
-function calcSolNoonUTC(jcent, longitude)
+zmanJS.calcSolNoonUTC = function (jcent, longitude)
 {
-	let tnoon = calcTimeJulianCent(calcJDFromJulianCent(jcent) + longitude/360.0);
-	let eqTime = calcEquationOfTime(tnoon);
+	let tnoon = zmanJS.calcTimeJulianCent(zmanJS.calcJDFromJulianCent(jcent) + longitude/360.0);
+	let eqTime = zmanJS.calcEquationOfTime(tnoon);
 	let solNoonUTC = 720 + (longitude * 4) - eqTime;
 
-	let newt = calcTimeJulianCent(calcJDFromJulianCent(jcent) -0.5 + solNoonUTC/1440.0);
+	let newt = zmanJS.calcTimeJulianCent(zmanJS.calcJDFromJulianCent(jcent) -0.5 + solNoonUTC/1440.0);
 
-	eqTime = calcEquationOfTime(newt);
+	eqTime = zmanJS.calcEquationOfTime(newt);
 	solNoonUTC = 720 + (longitude * 4) - eqTime;
 
 	return solNoonUTC;
 }
 
-function calcSunriseUTC(JD, latitude, longitude, zenith)
+zmanJS.calcSunriseUTC = function (JD, latitude, longitude, zenith)
 {
-	let jcent = calcTimeJulianCent(JD);
+	let jcent = zmanJS.calcTimeJulianCent(JD);
 
-	let noonmin = calcSolNoonUTC(jcent, longitude);
-	let tnoon = calcTimeJulianCent (JD+noonmin/1440.0);
+	let noonmin = zmanJS.calcSolNoonUTC(jcent, longitude);
+	let tnoon = zmanJS.calcTimeJulianCent (JD+noonmin/1440.0);
 
-	let eqTime = calcEquationOfTime(tnoon);
-	let solarDec = calcSunDeclination(tnoon);
-	let hourAngle = calcHourAngleSunrise(latitude, solarDec, zenith);
+	let eqTime = zmanJS.calcEquationOfTime(tnoon);
+	let solarDec = zmanJS.calcSunDeclination(tnoon);
+	let hourAngle = zmanJS.calcHourAngleSunrise(latitude, solarDec, zenith);
 
-	let delta = longitude - radToDeg(hourAngle);
+	let delta = longitude - zmanJS.radToDeg(hourAngle);
 	let timeDiff = 4 * delta;
 	let timeUTC = 720 + timeDiff - eqTime;
 
-	let newt = calcTimeJulianCent(calcJDFromJulianCent(jcent) + timeUTC/1440.0);
-	eqTime = calcEquationOfTime(newt);
-	solarDec = calcSunDeclination(newt);
-	hourAngle = calcHourAngleSunrise(latitude, solarDec, zenith);
-	delta = longitude - radToDeg(hourAngle);
+	let newt = zmanJS.calcTimeJulianCent(zmanJS.calcJDFromJulianCent(jcent) + timeUTC/1440.0);
+	eqTime = zmanJS.calcEquationOfTime(newt);
+	solarDec = zmanJS.calcSunDeclination(newt);
+	hourAngle = zmanJS.calcHourAngleSunrise(latitude, solarDec, zenith);
+	delta = longitude - zmanJS.radToDeg(hourAngle);
 	timeDiff = 4 * delta;
 	timeUTC = 720 + timeDiff - eqTime;
 
 	return timeUTC;
 }
 
-function calcSunsetUTC(JD, latitude, longitude, zenith)
+zmanJS.calcSunsetUTC = function (JD, latitude, longitude, zenith)
 {
-	let jcent = calcTimeJulianCent(JD);
+	let jcent = zmanJS.calcTimeJulianCent(JD);
 
-	let noonmin = calcSolNoonUTC(jcent, longitude);
-	let tnoon = calcTimeJulianCent (JD+noonmin/1440.0);
+	let noonmin = zmanJS.calcSolNoonUTC(jcent, longitude);
+	let tnoon = zmanJS.calcTimeJulianCent (JD+noonmin/1440.0);
 
-	let eqTime = calcEquationOfTime(tnoon);
-	let solarDec = calcSunDeclination(tnoon);
-	let hourAngle = calcHourAngleSunset(latitude, solarDec, zenith);
+	let eqTime = zmanJS.calcEquationOfTime(tnoon);
+	let solarDec = zmanJS.calcSunDeclination(tnoon);
+	let hourAngle = zmanJS.calcHourAngleSunset(latitude, solarDec, zenith);
 
-	let delta = longitude - radToDeg(hourAngle);
+	let delta = longitude - zmanJS.radToDeg(hourAngle);
 	let timeDiff = 4 * delta;
 	let timeUTC = 720 + timeDiff - eqTime;
 
-	let newt = calcTimeJulianCent(calcJDFromJulianCent(jcent) + timeUTC/1440.0);
-	eqTime = calcEquationOfTime(newt);
-	solarDec = calcSunDeclination(newt);
-	hourAngle = calcHourAngleSunset(latitude, solarDec, zenith);
+	let newt = zmanJS.calcTimeJulianCent(zmanJS.calcJDFromJulianCent(jcent) + timeUTC/1440.0);
+	eqTime = zmanJS.calcEquationOfTime(newt);
+	solarDec = zmanJS.calcSunDeclination(newt);
+	hourAngle = zmanJS.calcHourAngleSunset(latitude, solarDec, zenith);
 
-	delta = longitude - radToDeg(hourAngle);
+	delta = longitude - zmanJS.radToDeg(hourAngle);
 	timeDiff = 4 * delta;
 	timeUTC = 720 + timeDiff - eqTime;
 
 	return timeUTC;
 }
 
-function getElevationAdjustment(elevation)
+zmanJS.getElevationAdjustment = function (elevation)
 {
-	let elevationAdjustment = radToDeg(Math.acos(earthradius / (earthradius + (elevation / 1000))));
+	let elevationAdjustment = zmanJS.radToDeg(Math.acos(zmanJS.earthradius / (zmanJS.earthradius + (elevation / 1000))));
 	return elevationAdjustment;
 }
 
-function adjustZenith(zenith, elevation)
+zmanJS.adjustZenith = function (zenith, elevation)
 {
 	let adjustedZenith = zenith;
 	if (zenith == 90.0)
 	{
-		adjustedZenith = zenith + (solarradius + refraction + getElevationAdjustment(elevation));
+		adjustedZenith = zenith + (zmanJS.solarradius + zmanJS.refraction + zmanJS.getElevationAdjustment(elevation));
 	}
 	return adjustedZenith;
 }
 
-function getUTCSunrise(JD, here, zenith, adjustForElevation)
+zmanJS.getUTCSunrise = function (JD, here, zenith, adjustForElevation)
 {
 	let elevation = adjustForElevation ? here.elevation : 0;
-	let adjustedZenith = adjustZenith(zenith, elevation);
+	let adjustedZenith = zmanJS.adjustZenith(zenith, elevation);
 
-	let sunrise = calcSunriseUTC(JD, here.latitude, -here.longitude, adjustedZenith);
+	let sunrise = zmanJS.calcSunriseUTC(JD, here.latitude, -here.longitude, adjustedZenith);
 	sunrise = sunrise / 60;
 
 	while (sunrise < 0.0)
@@ -261,12 +263,12 @@ function getUTCSunrise(JD, here, zenith, adjustForElevation)
 	return sunrise;
 }
 
-function getUTCSunset(JD, here, zenith, adjustForElevation)
+zmanJS.getUTCSunset = function (JD, here, zenith, adjustForElevation)
 {
 	let elevation = adjustForElevation ? here.elevation : 0;
-	let adjustedZenith = adjustZenith(zenith, elevation);
+	let adjustedZenith = zmanJS.adjustZenith(zenith, elevation);
 
-	let sunset = calcSunsetUTC(JD, here.latitude, -here.longitude, adjustedZenith);
+	let sunset = zmanJS.calcSunsetUTC(JD, here.latitude, -here.longitude, adjustedZenith);
 	sunset = sunset / 60;
 
 	while (sunset < 0.0)
@@ -279,3 +281,5 @@ function getUTCSunset(JD, here, zenith, adjustForElevation)
 	}
 	return sunset;
 }
+
+}());
