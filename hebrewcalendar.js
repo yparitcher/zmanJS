@@ -601,6 +601,7 @@ zmanJS.hdate = function (year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0
 	}
 
 	this.iscandlelighting = function () {
+		if(this.wday == 6) {return 1;}
 		let current = this.getyomtov();
 		if((current >= zmanJS.yomtov.EREV_PESACH && current <= zmanJS.yomtov.EREV_SUKKOS)
 		|| (current == zmanJS.yomtov.CHOL_HAMOED_PESACH_DAY4 && !this.EY)
@@ -621,7 +622,6 @@ zmanJS.hdate = function (year=1, month=7, day=1, hour=0, minute=0, sec=0, msec=0
 		|| current == zmanJS.yomtov.ROSH_HASHANAH_DAY2
 		|| current == zmanJS.yomtov.SIMCHAS_TORAH)
 		&& this.wday == 6) {return 2;}
-		if(this.wday == 6) {return 1;}
 		if((this.month == 9 && this.day == 24)
 		|| (current >= zmanJS.yomtov.CHANUKAH_DAY1 && current <= zmanJS.yomtov.CHANUKAH_DAY7))
 		{
